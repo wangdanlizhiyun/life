@@ -1,7 +1,7 @@
 # 该library用于解决跟组件生命周期相关的问题。
- 1。封装动态权限请求(兼容小米等脑残手机，支持子线程调用)
+ 1。封装动态权限请求(兼容小米等脑残手机，支持子线程调用,不需要requestcode和注解)
  
- 2。封装startactivityforreuslt
+ 2。封装startactivityforreuslt（不需要requestcode和注解）
  
  3。初始化顺便解决InputMethodManager的内存泄露bug
  
