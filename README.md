@@ -1,8 +1,12 @@
 # 该library用于解决跟组件生命周期相关的问题。
  1。封装动态权限请求(兼容小米等脑残手机，支持子线程调用)
+ 
  2。封装startactivityforreuslt
+ 
  3。初始化顺便解决InputMethodManager的内存泄露bug
+ 
  4。可以获取activity/fragment生命周期，用于封装跟生命周期相关的功能模块。如braintree这个支付平台的2.0版本
+ 
  5。SyncTask封装一个同步任务类。当短时间内提交多个异步任务时，等待他们执行任务后回掉到ui线程
     * run方法触发执行一个异步任务，
     * doOnbackground定义具体异步任务，
