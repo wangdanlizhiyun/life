@@ -76,11 +76,14 @@ compile 'com.github.wangdanlizhiyun:life:v1.0.0'
            });
    ```
    生命周期获取(可以子线程使用)
+   
    ```LifeUtil.addLifeCycle(activity, new LifeCycleListener())
    LifeUtil.addLifeCycle(fragment, new LifeCycleListener())
    ```
    SyncTask使用示例
-   ```syncTask = new SyncTask(){
+   
+   ```
+   SyncTask syncTask = new SyncTask(){
       
                   @Override
                   public void doOnbackground() {
@@ -103,13 +106,6 @@ compile 'com.github.wangdanlizhiyun:life:v1.0.0'
                       return true;
                   }
               }.with(this);
-              findViewById(R.id.sync).setOnClickListener(new View.OnClickListener() {
-                  @Override
-                  public void onClick(View v) {
-                      syncTask.run();
-                  }
-              });```
-  #TODO:
-  
-  
-  
+              
+              syncTask.run();
+  ```
