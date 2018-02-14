@@ -7,8 +7,8 @@
  
 #使用
 maven { url 'https://jitpack.io' }
+compile 'com.github.wangdanlizhiyun:life:v1.0.0'
 
-implementation 'com.github.wangdanlizhiyun:permissionAndForResult:8c582910d4'
  
  
  在application里初始化
