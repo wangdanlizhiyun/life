@@ -173,7 +173,7 @@ public final class LifeUtil {
 
     public static void addLifeCycle(final Activity activity,final LifeCycleListener lifeCycleListener){
         if (isOnBackgroundThread()){
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
+            getMainHandler().post(new Runnable() {
                 @Override
                 public void run() {
                     getFragment(activity).addLifeCycleListener(lifeCycleListener);
@@ -185,7 +185,7 @@ public final class LifeUtil {
     }
     public static void addLifeCycle(final Fragment fragment, final LifeCycleListener lifeCycleListener){
         if (isOnBackgroundThread()){
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
+            getMainHandler().post(new Runnable() {
                 @Override
                 public void run() {
                     getFragment(fragment).addLifeCycleListener(lifeCycleListener);
@@ -194,6 +194,13 @@ public final class LifeUtil {
         }else {
             getFragment(fragment).addLifeCycleListener(lifeCycleListener);
         }
+    }
+    static Handler mMainHandler;
+    private static Handler getMainHandler(){
+        if (mMainHandler == null){
+            mMainHandler = new Handler(Looper.getMainLooper());
+        }
+        return mMainHandler;
     }
 
     public static EmptyFragment getFragment(Activity activity) {

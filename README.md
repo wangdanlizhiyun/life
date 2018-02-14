@@ -68,7 +68,7 @@ implementation 'com.github.wangdanlizhiyun:permissionAndForResult:8c582910d4'
                }
            });
    ```
-   生命周期获取
+   生命周期获取(可以子线程使用)
    ```LifeUtil.addLifeCycle(activity, new LifeCycleListener())
    LifeUtil.addLifeCycle(fragment, new LifeCycleListener())
    ```
