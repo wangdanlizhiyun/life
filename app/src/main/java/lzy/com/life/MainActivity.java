@@ -3,6 +3,7 @@ package lzy.com.life;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -91,5 +92,36 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        syncTask = new SyncTask(){
+
+            @Override
+            public void doOnbackground() {
+                Log.e("test","异步任务开始");
+                try {
+                    Thread.sleep(3_000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Log.e("test","异步任务结束");
+            }
+
+            @Override
+            public void doOnUiThreadWhenAllBackgroudTaskIsOver() {
+                Log.e("test","doOnUiThreadWhenAllBackgroudTaskIsOver");
+            }
+
+            @Override
+            public Boolean isRemoveOldTask() {
+                return true;
+            }
+        }.with(this);
+        findViewById(R.id.sync).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                syncTask.run();
+            }
+        });
+
     }
+    SyncTask syncTask;
 }

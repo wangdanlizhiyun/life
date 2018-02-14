@@ -3,6 +3,13 @@
  2。封装startactivityforreuslt
  3。初始化顺便解决InputMethodManager的内存泄露bug
  4。可以获取activity/fragment生命周期，用于封装跟生命周期相关的功能模块。如braintree这个支付平台的2.0版本
+ 5。SyncTask封装一个同步任务类。当短时间内提交多个异步任务时，等待他们执行任务后回掉到ui线程
+    * run方法触发执行一个异步任务，
+    * doOnbackground定义具体异步任务，
+    * doOnUiThreadWhenAllBackgroudTaskIsOver ui线程回掉，
+    * isRemoveOldTask是否放弃还没有开始的旧任务，默认false表示全部执行
+    * release释放回掉对象
+    * with(activity/fragmet)绑定所在组件，destroy时自动release，其他情况自行处理释放
  
  
 #使用
@@ -72,6 +79,36 @@ compile 'com.github.wangdanlizhiyun:life:v1.0.0'
    ```LifeUtil.addLifeCycle(activity, new LifeCycleListener())
    LifeUtil.addLifeCycle(fragment, new LifeCycleListener())
    ```
+   SyncTask使用示例
+   ```syncTask = new SyncTask(){
+      
+                  @Override
+                  public void doOnbackground() {
+                      Log.e("test","异步任务开始");
+                      try {
+                          Thread.sleep(3_000);
+                      } catch (InterruptedException e) {
+                          e.printStackTrace();
+                      }
+                      Log.e("test","异步任务结束");
+                  }
+      
+                  @Override
+                  public void doOnUiThreadWhenAllBackgroudTaskIsOver() {
+                      Log.e("test","doOnUiThreadWhenAllBackgroudTaskIsOver");
+                  }
+      
+                  @Override
+                  public Boolean isRemoveOldTask() {
+                      return true;
+                  }
+              }.with(this);
+              findViewById(R.id.sync).setOnClickListener(new View.OnClickListener() {
+                  @Override
+                  public void onClick(View v) {
+                      syncTask.run();
+                  }
+              });```
   #TODO:
   
   
