@@ -1,0 +1,18 @@
+package lzy.com.life_library.utils.checkDetailPermissionUtils;
+
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.support.v4.content.ContextCompat;
+
+import lzy.com.life_library.entity.PermissionType;
+
+/**
+ * Created by lizhiyun on 2018/2/12.
+ */
+
+public class CheckGET_ACCOUNTS implements Check {
+    @Override
+    public Boolean check(Context context) throws Throwable {
+        return ContextCompat.checkSelfPermission(context, PermissionType.GET_ACCOUNTS) == PackageManager.PERMISSION_GRANTED;
+    }
+}
