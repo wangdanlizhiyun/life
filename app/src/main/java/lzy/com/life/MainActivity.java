@@ -21,32 +21,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        LifeUtil.addLifeCycle(this, new LifeCycleListener() {
-            @Override
-            public void onStart() {
-
-            }
-
-            @Override
-            public void onResume() {
-
-            }
-
-            @Override
-            public void onPause() {
-
-            }
-
-            @Override
-            public void onStop() {
-
-            }
-
-            @Override
-            public void onDestory() {
-
-            }
-        });
         findViewById(R.id.tv_call).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

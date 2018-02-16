@@ -17,6 +17,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import lzy.com.life_library.entity.PermissionRequest;
 import lzy.com.life_library.fragment.EmptyFragment;
@@ -130,37 +131,40 @@ public final class LifeUtil {
     private static WeakReference<Activity> mWeakReferenceActivity;
 
     private static int mActivityCounts = 0;
+    static AtomicBoolean mIsAppInited = new AtomicBoolean(false);
     public static void init(Application application) {
-        application.registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacksAdapter() {
-            @Override
-            public void onActivityStarted(Activity activity) {
-                super.onActivityStarted(activity);
-                mWeakReferenceActivity = new WeakReference<Activity>(activity);
-                mActivityCounts++;
-                if (mActivityCounts == 1){
-                    if (mAppFourgroundOrBackgroundChangeListener != null){
-                        mAppFourgroundOrBackgroundChangeListener.change(false);
+        if (mIsAppInited.compareAndSet(false,true)){
+            application.registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacksAdapter() {
+                @Override
+                public void onActivityStarted(Activity activity) {
+                    super.onActivityStarted(activity);
+                    mWeakReferenceActivity = new WeakReference<Activity>(activity);
+                    mActivityCounts++;
+                    if (mActivityCounts == 1){
+                        if (mAppFourgroundOrBackgroundChangeListener != null){
+                            mAppFourgroundOrBackgroundChangeListener.change(false);
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onActivityStopped(Activity activity) {
-                super.onActivityStopped(activity);
-                mActivityCounts--;
-                if (mActivityCounts == 0){
-                    if (mAppFourgroundOrBackgroundChangeListener != null){
-                        mAppFourgroundOrBackgroundChangeListener.change(true);
+                @Override
+                public void onActivityStopped(Activity activity) {
+                    super.onActivityStopped(activity);
+                    mActivityCounts--;
+                    if (mActivityCounts == 0){
+                        if (mAppFourgroundOrBackgroundChangeListener != null){
+                            mAppFourgroundOrBackgroundChangeListener.change(true);
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onActivityDestroyed(Activity activity) {
-                super.onActivityDestroyed(activity);
-                InputMethodManagerUtil.fixInputMethodManagerLeak(activity);
-            }
-        });
+                @Override
+                public void onActivityDestroyed(Activity activity) {
+                    super.onActivityDestroyed(activity);
+                    InputMethodManagerUtil.fixInputMethodManagerLeak(activity);
+                }
+            });
+        }
     }
     public static void init(Activity activity) {
         init(activity.getApplication());
