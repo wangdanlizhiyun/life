@@ -18,7 +18,7 @@
  
 #使用
 maven { url 'https://jitpack.io' }
-compile 'com.github.wangdanlizhiyun:life:v1.0.2'
+compile 'com.github.wangdanlizhiyun:life:v1.0.3'
 
  
  
