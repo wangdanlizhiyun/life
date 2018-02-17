@@ -54,7 +54,7 @@ public final class LifeUtil {
     private static void requestPermission(@NonNull final Activity activity, final PermissionRequest permissionRequest) {
         if (activity != null) {
             if (isOnBackgroundThread()){
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                getMainHandler().post(new Runnable() {
                     @Override
                     public void run() {
                         getFragment(activity).doRequestPermissions(activity, permissionRequest);
@@ -199,11 +199,11 @@ public final class LifeUtil {
             getFragment(fragment).addLifeCycleListener(lifeCycleListener);
         }
     }
-    static Handler mMainHandler;
+    static final Handler mMainHandler;
+    static {
+        mMainHandler = new Handler(Looper.getMainLooper());
+    }
     private static Handler getMainHandler(){
-        if (mMainHandler == null){
-            mMainHandler = new Handler(Looper.getMainLooper());
-        }
         return mMainHandler;
     }
 
