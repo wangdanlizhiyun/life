@@ -12,7 +12,12 @@ import android.os.Message;
 import android.os.MessageQueue;
 import android.util.Log;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 import lzy.com.life_library.listener.LifeCycleListener;
 import lzy.com.life_library.utils.LifeUtil;
@@ -29,15 +34,46 @@ import lzy.com.life_library.utils.LifeUtil;
  *
  */
 
-public abstract class SyncTask implements MessageQueue.IdleHandler {
+public abstract class SyncTask<Params,Result> implements MessageQueue.IdleHandler {
     MessageQueue messageQueue = null;
     Handler mainHandler;
-    Handler handler;
+    Handler threadHandler;
+    Result result;
 
     public SyncTask() {
-        HandlerThread handlerThread = new HandlerThread("DataModel");
+        HandlerThread handlerThread = new HandlerThread("workThread");
         handlerThread.start();
-        Looper looper = handlerThread.getLooper();
+        if ((messageQueue = getMessageQueue(handlerThread.getLooper())) != null) {
+            messageQueue.addIdleHandler(this);
+        }
+
+        threadHandler = new Handler(handlerThread.getLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                    if (msg.obj instanceof Object[]){
+                        Object[] objects = (Object[]) msg.obj;
+                        if (objects != null && objects.length > 0){
+                            ArrayList<Params> ts = new ArrayList<>();
+                            for (Object object:objects
+                                    ) {
+                                ts.add((Params) object);
+                            }
+                            result = doOnbackground(ts);
+                        }
+                    }
+
+            }
+        };
+        mainHandler = new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                doOnUiThreadWhenAllBackgroudTaskIsOver(result);
+            }
+        };
+    }
+    public MessageQueue getMessageQueue(Looper looper){
+        MessageQueue messageQueue = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             messageQueue = looper.getQueue();
         } else {
@@ -51,29 +87,12 @@ public abstract class SyncTask implements MessageQueue.IdleHandler {
                 e.printStackTrace();
             }
         }
-        if (messageQueue != null) {
-            messageQueue.addIdleHandler(this);
-        }
-
-        handler = new Handler(looper) {
-            @Override
-            public void handleMessage(Message msg) {
-                doOnbackground();
-
-            }
-        };
-        mainHandler = new Handler(Looper.getMainLooper()) {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                doOnUiThreadWhenAllBackgroudTaskIsOver();
-            }
-        };
+        return messageQueue;
     }
 
-    public abstract void doOnbackground();
+    public abstract Result doOnbackground(List<Params> params);
 
-    public abstract void doOnUiThreadWhenAllBackgroudTaskIsOver();
+    public abstract void doOnUiThreadWhenAllBackgroudTaskIsOver(Result result);
 
     public SyncTask with(Activity activity) {
         LifeUtil.addLifeCycle(activity, new InnerLifeCycleListener());
@@ -121,16 +140,21 @@ public abstract class SyncTask implements MessageQueue.IdleHandler {
 
     @Override
     public boolean queueIdle() {
-        mainHandler.sendEmptyMessage(0);
+        Message message = mainHandler.obtainMessage();
+        message.obj = result;
+        mainHandler.sendMessage(message);
         return true;
     }
 
-    public void run() {
+    public void run(Params... params) {
         if (isRemoveOldTask()) {
-            handler.removeCallbacksAndMessages(null);
+            threadHandler.removeCallbacksAndMessages(null);
         }
-        handler.sendEmptyMessageDelayed(0, 0);
+        Message message = threadHandler.obtainMessage();
+        message.obj = params;
+        threadHandler.sendMessageDelayed(message, 0);
     }
+
 
     /**
      * 是否放弃还没有开始的旧任务

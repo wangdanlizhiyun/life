@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lzy.com.life_library.entity.PermissionType;
@@ -66,22 +67,27 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        syncTask = new SyncTask(){
-
+        syncTask = new SyncTask<Boolean,String>(){
             @Override
-            public void doOnbackground() {
-                Log.e("test","异步任务开始");
+            public String doOnbackground(List<Boolean> booleans) {
+                Log.e("test","点赞开始"+booleans.get(0));
                 try {
                     Thread.sleep(3_000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Log.e("test","异步任务结束");
+                Log.e("test","点赞结束"+booleans.get(0));
+                return "返回点赞结果:"+booleans.get(0);
             }
 
             @Override
-            public void doOnUiThreadWhenAllBackgroudTaskIsOver() {
-                Log.e("test","doOnUiThreadWhenAllBackgroudTaskIsOver");
+            public void doOnUiThreadWhenAllBackgroudTaskIsOver(String s) {
+                Log.e("test","获取点赞结果，修改ui");
+                if (s.endsWith("true")){
+
+                }else {
+
+                }
             }
 
             @Override
@@ -89,13 +95,17 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         }.with(this);
+        //快速多次点击模拟点赞。
         findViewById(R.id.sync).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                syncTask.run();
+                //客户端预测点赞或去赞成功
+                mIsZan = !mIsZan;
+                syncTask.run(mIsZan);
             }
         });
 
     }
+    Boolean mIsZan = false;
     SyncTask syncTask;
 }
