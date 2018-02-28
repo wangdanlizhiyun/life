@@ -1,21 +1,15 @@
-package lzy.com.life;
+package lzy.com.life_library.task;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.os.MessageQueue;
-import android.util.Log;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -136,6 +130,8 @@ public abstract class SyncTask<Params,Result> implements MessageQueue.IdleHandle
      */
     public void release() {
         messageQueue.removeIdleHandler(this);
+        mainHandler.removeCallbacksAndMessages(null);
+        threadHandler.removeCallbacksAndMessages(null);
     }
 
     @Override

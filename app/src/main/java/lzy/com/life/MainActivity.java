@@ -11,9 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lzy.com.life_library.entity.PermissionType;
+import lzy.com.life_library.listener.AppGotoBackgroundSomeTimeListener;
 import lzy.com.life_library.listener.LifeCycleListener;
 import lzy.com.life_library.listener.PermissionDeniedListener;
 import lzy.com.life_library.listener.ResultListenerAdapter;
+import lzy.com.life_library.task.SyncTask;
 import lzy.com.life_library.utils.LifeUtil;
 
 public class MainActivity extends AppCompatActivity {
@@ -102,6 +104,17 @@ public class MainActivity extends AppCompatActivity {
                 //客户端预测点赞或去赞成功
                 mIsZan = !mIsZan;
                 syncTask.run(mIsZan);
+            }
+        });
+        LifeUtil.addAppGotoBackgroundSomeTimeListener(new AppGotoBackgroundSomeTimeListener() {
+            @Override
+            public long delayTime() {
+                return 30_000;
+            }
+
+            @Override
+            public void gotoBackground() {
+                Log.e("test","app 退到后台30秒了");
             }
         });
 

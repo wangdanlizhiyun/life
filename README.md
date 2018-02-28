@@ -125,3 +125,17 @@ compile 'com.github.wangdanlizhiyun:life:v1.0.3'
                }
            });
   ```
+  监听app退到后台多久
+  ```
+  LifeUtil.addAppGotoBackgroundSomeTimeListener(new AppGotoBackgroundSomeTimeListener() {
+                 @Override
+                 public long delayTime() {
+                     return 30_000;
+                 }
+     
+                 @Override
+                 public void gotoBackground() {
+                     Log.e("test","app 退到后台30秒了");
+                 }
+             });
+   ```

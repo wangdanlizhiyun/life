@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.LruCache;
@@ -16,11 +17,15 @@ import android.util.LruCache;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import lzy.com.life_library.entity.PermissionRequest;
 import lzy.com.life_library.fragment.EmptyFragment;
+import lzy.com.life_library.listener.AppGotoBackgroundSomeTimeListener;
 import lzy.com.life_library.listener.LifeCycleListener;
 import lzy.com.life_library.listener.ActivityLifecycleCallbacksAdapter;
 import lzy.com.life_library.listener.AppFourgroundOrBackgroundChangeListener;
@@ -144,6 +149,7 @@ public final class LifeUtil {
                         if (mAppFourgroundOrBackgroundChangeListener != null){
                             mAppFourgroundOrBackgroundChangeListener.change(false);
                         }
+                        getMainHandler().removeMessages(WHAT_GotoBackgroundSomeTime);
                     }
                 }
 
@@ -154,6 +160,14 @@ public final class LifeUtil {
                     if (mActivityCounts == 0){
                         if (mAppFourgroundOrBackgroundChangeListener != null){
                             mAppFourgroundOrBackgroundChangeListener.change(true);
+                        }
+                        Iterator<Map.Entry<Integer,AppGotoBackgroundSomeTimeListener>> entryIterator = mAppGotoBackgroundSomeTimeListeners.entrySet().iterator();
+                        while (entryIterator.hasNext()){
+                            AppGotoBackgroundSomeTimeListener listener = entryIterator.next().getValue();
+                            Message message = getMainHandler().obtainMessage();
+                            message.what = WHAT_GotoBackgroundSomeTime;
+                            message.arg1 = listener.hashCode();
+                            getMainHandler().sendMessageDelayed(message,listener.delayTime());
                         }
                     }
                 }
@@ -173,6 +187,14 @@ public final class LifeUtil {
 
     public static void setAppFourgroundOrBackgroundChangeListener(AppFourgroundOrBackgroundChangeListener mAppFourgroundOrBackgroundChangeListener) {
         LifeUtil.mAppFourgroundOrBackgroundChangeListener = mAppFourgroundOrBackgroundChangeListener;
+    }
+    static ConcurrentHashMap<Integer,AppGotoBackgroundSomeTimeListener> mAppGotoBackgroundSomeTimeListeners = new ConcurrentHashMap<>();
+    private static final int WHAT_GotoBackgroundSomeTime = 1;
+    public static void addAppGotoBackgroundSomeTimeListener(AppGotoBackgroundSomeTimeListener listener){
+        mAppGotoBackgroundSomeTimeListeners.put(listener.hashCode(),listener);
+    }
+    public static void releaseAppGotoBackgroundSomeTimeListener(AppGotoBackgroundSomeTimeListener listener){
+        mAppGotoBackgroundSomeTimeListeners.remove(listener.hashCode());
     }
 
     public static void addLifeCycle(final Activity activity,final LifeCycleListener lifeCycleListener){
@@ -201,7 +223,20 @@ public final class LifeUtil {
     }
     static final Handler mMainHandler;
     static {
-        mMainHandler = new Handler(Looper.getMainLooper());
+        mMainHandler = new Handler(Looper.getMainLooper()){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what){
+                    case WHAT_GotoBackgroundSomeTime:
+                        AppGotoBackgroundSomeTimeListener appGotoBackgroundSomeTimeListener = mAppGotoBackgroundSomeTimeListeners.get(msg.arg1);
+                        if (appGotoBackgroundSomeTimeListener != null){
+                            appGotoBackgroundSomeTimeListener.gotoBackground();
+                        }
+                        break;
+                }
+            }
+        };
     }
     private static Handler getMainHandler(){
         return mMainHandler;
