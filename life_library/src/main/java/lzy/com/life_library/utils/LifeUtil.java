@@ -11,7 +11,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 import android.util.LruCache;
 
 import java.lang.ref.WeakReference;
@@ -24,16 +23,25 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import lzy.com.life_library.entity.PermissionRequest;
+import lzy.com.life_library.entity.PermissionRequestBuilder;
 import lzy.com.life_library.fragment.EmptyFragment;
-import lzy.com.life_library.listener.AppGotoBackgroundSomeTimeListener;
-import lzy.com.life_library.listener.LifeCycleListener;
 import lzy.com.life_library.listener.ActivityLifecycleCallbacksAdapter;
 import lzy.com.life_library.listener.AppFourgroundOrBackgroundChangeListener;
-import lzy.com.life_library.listener.PermissionDeniedListener;
+import lzy.com.life_library.listener.AppGotoBackgroundSomeTimeListener;
+import lzy.com.life_library.listener.LifeCycleListener;
+import lzy.com.life_library.listener.ResultCancelListener;
+import lzy.com.life_library.listener.ResultFirstUserListener;
 import lzy.com.life_library.listener.ResultListener;
+import lzy.com.life_library.listener.ResultOkListener;
 
 public final class LifeUtil {
-    public static void startActivityForResult(Intent intent, ResultListener resultListener) {
+    public static ResultListenerBuilder resultOk(ResultOkListener resultOkListener){
+        ResultListenerBuilder resultListenerBuilder = new ResultListenerBuilder();
+        resultListenerBuilder.resultOk(resultOkListener);
+        return resultListenerBuilder;
+    }
+
+    protected static void startActivityForResult(Intent intent, ResultListener resultListener) {
         startActivityForResult(getActivity(),intent,resultListener);
     }
 
@@ -43,15 +51,44 @@ public final class LifeUtil {
             getFragment(activity).startActivityForResult(intent, resultListener);
         }
     }
-    static LruCache<String,PermissionRequestBuilder> permissionRequestBuilderLruCache;
-    public static PermissionRequestBuilder permission(String... permissions) {
-        if (permissionRequestBuilderLruCache == null){
-            permissionRequestBuilderLruCache = new LruCache<>(1);
+    public static class ResultListenerBuilder {
+        ResultOkListener resultOkListener;
+        ResultCancelListener resultCancelListener;
+        ResultFirstUserListener resultFirstUserListener;
+        public ResultListenerBuilder resultOk(ResultOkListener resultOkListener){
+            this.resultOkListener = resultOkListener;
+            return this;
         }
-        PermissionRequestBuilder permissionRequestBuilder = permissionRequestBuilderLruCache.get("permissionRequestBuilderLruCache");
+        public ResultListenerBuilder resultCancel(ResultCancelListener resultCancelListener){
+            this.resultCancelListener = resultCancelListener;
+            return this;
+        }
+        public ResultListenerBuilder resultFirstUser(ResultFirstUserListener resultFirstUserListener){
+            this.resultFirstUserListener = resultFirstUserListener;
+            return this;
+        }
+
+        private ResultListener build(){
+            ResultListener resultListener = new ResultListener();
+            resultListener.setResultOkListener(resultOkListener);
+            resultListener.setResultCancelListener(resultCancelListener);
+            resultListener.setResultFirstUserListener(resultFirstUserListener);
+            return resultListener;
+        }
+
+        public void startActivityForResult(Intent intent){
+            LifeUtil.startActivityForResult(intent,build());
+        }
+    }
+    static LruCache<String,PermissionRequestBuilder> sPermissionRequestBuilderLruCache;
+    public static PermissionRequestBuilder permission(String... permissions) {
+        if (sPermissionRequestBuilderLruCache == null){
+            sPermissionRequestBuilderLruCache = new LruCache<>(1);
+        }
+        PermissionRequestBuilder permissionRequestBuilder = sPermissionRequestBuilderLruCache.get("permissionRequestBuilderLruCache");
         if (permissionRequestBuilder == null){
             permissionRequestBuilder = new PermissionRequestBuilder();
-            permissionRequestBuilderLruCache.put("permissionRequestBuilderLruCache",permissionRequestBuilder);
+            sPermissionRequestBuilderLruCache.put("permissionRequestBuilderLruCache",permissionRequestBuilder);
         }
         return permissionRequestBuilder.permission(permissions);
     }
@@ -71,51 +108,11 @@ public final class LifeUtil {
         }
     }
 
-    private static void requestPermission(PermissionRequest permissionRequest) {
+    public static void requestPermission(PermissionRequest permissionRequest) {
         requestPermission(getActivity(), permissionRequest);
     }
 
-    public static class PermissionRequestBuilder {
-        ArrayList<String> mPermissions;
-        PermissionDeniedListener mPermissionDeniedListener;
-        Runnable mRunnable;
 
-        LruCache<String ,PermissionRequest> mPermissionRequestLruCache;
-
-        public PermissionRequestBuilder() {
-            mPermissions = new ArrayList<>(5);
-            mPermissionRequestLruCache = new LruCache<>(1);
-        }
-
-        public PermissionRequestBuilder permission(String... permissions) {
-            for (String permission : permissions
-                    ) {
-                if (!TextUtils.isEmpty(permission)) {
-                    mPermissions.add(permission);
-                }
-            }
-            return this;
-        }
-
-        public PermissionRequestBuilder deny(PermissionDeniedListener listener) {
-            mPermissionDeniedListener = listener;
-            return this;
-        }
-
-
-        public void run(Runnable runnable) {
-            mRunnable = runnable;
-            PermissionRequest permissionRequest = mPermissionRequestLruCache.get("permissionRequest");
-            if (permissionRequest == null){
-                permissionRequest = new PermissionRequest();
-                mPermissionRequestLruCache.put("permissionRequest",permissionRequest);
-            }
-            permissionRequest.setPermissions(mPermissions.toArray(new String[]{}));
-            permissionRequest.setPermissionDeniedListener(mPermissionDeniedListener);
-            permissionRequest.setRunnable(mRunnable);
-            requestPermission(permissionRequest);
-        }
-    }
 
     public static boolean isNeedCheck(Context context) {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M

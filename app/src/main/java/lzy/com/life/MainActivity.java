@@ -7,14 +7,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import lzy.com.life_library.entity.PermissionType;
 import lzy.com.life_library.listener.AppGotoBackgroundSomeTimeListener;
-import lzy.com.life_library.listener.LifeCycleListener;
 import lzy.com.life_library.listener.PermissionDeniedListener;
-import lzy.com.life_library.listener.ResultListenerAdapter;
+import lzy.com.life_library.listener.ResultCancelListener;
+import lzy.com.life_library.listener.ResultOkListener;
 import lzy.com.life_library.task.SyncTask;
 import lzy.com.life_library.utils.LifeUtil;
 
@@ -51,21 +50,19 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.get_result).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LifeUtil.startActivityForResult(new Intent(MainActivity.this, SecondActivity.class), new ResultListenerAdapter() {
+                LifeUtil.resultOk(new ResultOkListener() {
                     @Override
                     public void onResultOk(Intent intent) {
-                        super.onResultOk(intent);
                         int id = intent.getIntExtra("id", 0);
                         Toast.makeText(MainActivity.this, "获取id=" + id, Toast.LENGTH_SHORT).show();
                     }
-
+                }).resultCancel(new ResultCancelListener() {
                     @Override
                     public void onResultCancel(Intent intent) {
-                        super.onResultCancel(intent);
                         int id = intent.getIntExtra("id", 0);
                         Toast.makeText(MainActivity.this, "取消 但是返回id=" + id, Toast.LENGTH_SHORT).show();
                     }
-                });
+                }).startActivityForResult(new Intent(MainActivity.this, SecondActivity.class));
             }
         });
 

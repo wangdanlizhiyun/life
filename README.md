@@ -53,21 +53,19 @@ compile 'com.github.wangdanlizhiyun:life:1.0.4'
   startActivityForResult
   
    ```
-        LifeUtil.startActivityForResult(new Intent(MainActivity.this,SecondActivity.class),new ResultListenerAdapter(){
+        LifeUtil.resultOk(new ResultOkListener() {
                             @Override
                             public void onResultOk(Intent intent) {
-                                super.onResultOk(intent);
-                                int id = intent.getIntExtra("id",0);
-                                Toast.makeText(MainActivity.this,"获取id="+id,Toast.LENGTH_SHORT).show();
+                                int id = intent.getIntExtra("id", 0);
+                                Toast.makeText(MainActivity.this, "获取id=" + id, Toast.LENGTH_SHORT).show();
                             }
-        
+                        }).resultCancel(new ResultCancelListener() {
                             @Override
                             public void onResultCancel(Intent intent) {
-                                super.onResultCancel(intent);
-                                int id = intent.getIntExtra("id",0);
-                                Toast.makeText(MainActivity.this,"取消 但是返回id="+id,Toast.LENGTH_SHORT).show();
+                                int id = intent.getIntExtra("id", 0);
+                                Toast.makeText(MainActivity.this, "取消 但是返回id=" + id, Toast.LENGTH_SHORT).show();
                             }
-                        });
+                        }).startActivityForResult(new Intent(MainActivity.this, SecondActivity.class));
    ```
    
    前后台切换监听

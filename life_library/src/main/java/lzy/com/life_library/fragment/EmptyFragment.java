@@ -183,15 +183,23 @@ public class EmptyFragment extends Fragment {
         if (mResultListener == null) return;
         if (requestCode != REQUEST_CODE) return;
         if (data == null){
-            mResultListener.onResultCancel(new Intent());
+            if (mResultListener.getResultCancelListener() != null){
+                mResultListener.getResultCancelListener().onResultCancel(new Intent());
+            }
             return;
         }
         if (resultCode == Activity.RESULT_OK) {
-            mResultListener.onResultOk(data);
+            if (mResultListener.getResultOkListener() != null){
+                mResultListener.getResultOkListener().onResultOk(data);
+            }
         } else if (resultCode == Activity.RESULT_CANCELED) {
-            mResultListener.onResultCancel(data);
+            if (mResultListener.getResultCancelListener() != null){
+                mResultListener.getResultCancelListener().onResultCancel(data);
+            }
         } else if (resultCode == Activity.RESULT_FIRST_USER) {
-            mResultListener.onResultFirstUser(data);
+            if (mResultListener.getResultFirstUserListener() != null){
+                mResultListener.getResultFirstUserListener().onResultFirstUser(data);
+            }
         }
     }
 
