@@ -13,7 +13,7 @@ import android.provider.ContactsContract;
 
 public class CheckWRITE_CONTACTS implements Check {
     @Override
-    public Boolean check(Context context) throws Throwable {
+    public Boolean check(Context context) throws Exception {
         Cursor cursor = context.getContentResolver().query(ContactsContract.Data.CONTENT_URI,
                 new String[]{ContactsContract.Data.RAW_CONTACT_ID},
                 ContactsContract.Data.MIMETYPE + "=? and " + ContactsContract.Data.DATA1 + "=?",

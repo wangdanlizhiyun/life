@@ -8,5 +8,5 @@ import android.database.Cursor;
  */
 
 public interface Check {
-    public Boolean check(Context context) throws Throwable;
+    public Boolean check(Context context) throws Exception;
 }

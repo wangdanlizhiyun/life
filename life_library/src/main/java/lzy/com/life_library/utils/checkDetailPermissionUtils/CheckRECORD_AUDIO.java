@@ -14,7 +14,7 @@ public class CheckRECORD_AUDIO implements Check {
     private File mTempFile = null;
 
     @Override
-    public Boolean check(Context context) throws Throwable {
+    public Boolean check(Context context) throws Exception {
         MediaRecorder mediaRecorder = new MediaRecorder();
         try {
             mTempFile = File.createTempFile("permission", "test");

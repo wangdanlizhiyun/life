@@ -15,7 +15,7 @@ import android.provider.CallLog;
 public class CheckWRITE_CALL_LOG implements Check {
     @SuppressLint("MissingPermission")
     @Override
-    public Boolean check(Context context) throws Throwable {
+    public Boolean check(Context context) throws Exception {
         ContentResolver resolver = context.getContentResolver();
         try {
             ContentValues content = new ContentValues();

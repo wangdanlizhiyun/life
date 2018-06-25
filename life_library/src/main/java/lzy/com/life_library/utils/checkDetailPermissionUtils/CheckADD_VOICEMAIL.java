@@ -14,7 +14,7 @@ import android.text.TextUtils;
 
 public class CheckADD_VOICEMAIL implements Check {
     @Override
-    public Boolean check(Context context) throws Throwable {
+    public Boolean check(Context context) throws Exception {
         try {
             ContentResolver contentResolver = context.getContentResolver();
             Uri mBaseUri = VoicemailContract.Voicemails.CONTENT_URI;

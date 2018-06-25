@@ -14,7 +14,7 @@ import android.support.annotation.RequiresApi;
 public class CheckREAD_SMS implements Check {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    public Boolean check(Context context) throws Throwable {
+    public Boolean check(Context context) throws Exception {
         ContentResolver contentResolver = context.getContentResolver();
         String[] projection = new String[]{Telephony.Sms._ID, Telephony.Sms.ADDRESS, Telephony.Sms.PERSON, Telephony.Sms.BODY};
         Cursor cursor = contentResolver.query(Telephony.Sms.CONTENT_URI, projection, null, null, null);

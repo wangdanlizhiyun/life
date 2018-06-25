@@ -16,7 +16,7 @@ import java.util.TimeZone;
 public class CheckWRITE_CALENDAR implements Check {
 
     @Override
-    public Boolean check(Context context) throws Throwable {
+    public Boolean check(Context context) throws Exception {
         final String NAME = "PERMISSION";
         final String ACCOUNT = "permission@gmail.com";
         try {

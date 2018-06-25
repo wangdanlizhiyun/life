@@ -10,19 +10,23 @@ import android.net.sip.SipProfile;
 
 public class CheckUSE_SIP implements Check {
     @Override
-    public Boolean check(Context context) throws Throwable {
-        if (!SipManager.isApiSupported(context)) {
-            return true;
+    public Boolean check(Context context) throws Exception {
+        try {
+            if (!SipManager.isApiSupported(context)) {
+                return true;
+            }
+            SipManager manager = SipManager.newInstance(context);
+            if (manager == null) {
+                return true;
+            }
+            SipProfile.Builder builder = new SipProfile.Builder("Permission", "127.0.0.1");
+            builder.setPassword("132654");
+            SipProfile profile = builder.build();
+            manager.open(profile);
+            manager.close(profile.getUriString());
+        }finally {
+
         }
-        SipManager manager = SipManager.newInstance(context);
-        if (manager == null) {
-            return true;
-        }
-        SipProfile.Builder builder = new SipProfile.Builder("Permission", "127.0.0.1");
-        builder.setPassword("132654");
-        SipProfile profile = builder.build();
-        manager.open(profile);
-        manager.close(profile.getUriString());
         return true;
     }
 }

@@ -12,7 +12,7 @@ import lzy.com.life_library.entity.PermissionType;
 
 public class CheckPROCESS_OUTGOING_CALLS implements Check {
     @Override
-    public Boolean check(Context context) throws Throwable {
+    public Boolean check(Context context) throws Exception {
         return ContextCompat.checkSelfPermission(context, PermissionType.PROCESS_OUTGOING_CALLS) == PackageManager.PERMISSION_GRANTED;
     }
 }

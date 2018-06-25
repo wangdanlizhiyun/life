@@ -11,7 +11,7 @@ import android.view.SurfaceView;
 
 public class CheckCamera implements Check {
     @Override
-    public Boolean check(Context context) throws Throwable {
+    public Boolean check(Context context) throws Exception {
         Camera camera = null;
         SurfaceView surfaceView = new SurfaceView(context);
         SurfaceHolder mHolder = surfaceView.getHolder();

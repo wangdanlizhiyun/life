@@ -12,7 +12,7 @@ import android.hardware.SensorManager;
 
 public class CheckBODY_SENSORS implements Check {
     @Override
-    public Boolean check(Context context) throws Throwable {
+    public Boolean check(Context context) throws Exception {
         SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         Sensor heartRateSensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
         if (heartRateSensor != null) {

@@ -11,7 +11,7 @@ import java.io.File;
 
 public class CheckWRITE_EXTERNAL_STORAGE implements Check {
     @Override
-    public Boolean check(Context context) throws Throwable {
+    public Boolean check(Context context) throws Exception {
         File directory = Environment.getExternalStorageDirectory();
         if (!directory.exists() || !directory.canWrite()) return false;
         File file = new File(directory, "a.b.c.d");

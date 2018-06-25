@@ -13,7 +13,7 @@ import android.provider.CallLog;
 public class CheckREAD_CALL_LOG implements Check {
 
     @Override
-    public Boolean check(Context context) throws Throwable {
+    public Boolean check(Context context) throws Exception {
         ContentResolver resolver = context.getContentResolver();
         String[] projection = new String[]{CallLog.Calls._ID, CallLog.Calls.NUMBER, CallLog.Calls.TYPE};
         @SuppressLint("MissingPermission")

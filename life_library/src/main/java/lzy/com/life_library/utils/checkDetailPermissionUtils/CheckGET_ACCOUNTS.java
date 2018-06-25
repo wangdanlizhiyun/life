@@ -12,7 +12,7 @@ import lzy.com.life_library.entity.PermissionType;
 
 public class CheckGET_ACCOUNTS implements Check {
     @Override
-    public Boolean check(Context context) throws Throwable {
+    public Boolean check(Context context) throws Exception {
         return ContextCompat.checkSelfPermission(context, PermissionType.GET_ACCOUNTS) == PackageManager.PERMISSION_GRANTED;
     }
 }

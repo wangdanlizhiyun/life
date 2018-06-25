@@ -12,7 +12,7 @@ import lzy.com.life_library.entity.PermissionType;
 
 public class CheckCALL_PHONE implements Check {
     @Override
-    public Boolean check(Context context) throws Throwable {
+    public Boolean check(Context context) throws Exception {
         return ContextCompat.checkSelfPermission(context, PermissionType.CALL_PHONE) == PackageManager.PERMISSION_GRANTED;
     }
 }

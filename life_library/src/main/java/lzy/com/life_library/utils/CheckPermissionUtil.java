@@ -123,8 +123,8 @@ public class CheckPermissionUtil {
             if (check != null){
                 return check.check(context);
             }
-        }catch (Throwable throwable){
-            throwable.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
         }
         return false;
     }

@@ -2,58 +2,28 @@ package lzy.com.life_library.utils.checkDetailPermissionUtils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 
 import java.util.List;
+
+import lzy.com.life_library.entity.PermissionType;
 
 /**
  * Created by lizhiyun on 2018/2/13.
  */
 
 public class CheckLOCATION implements Check {
-    @SuppressLint("MissingPermission")
     @Override
-    public Boolean check(Context context) throws Throwable {
-            LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        List<String> list = locationManager.getProviders(true);
+    public Boolean check(Context context) throws Exception {
 
-        if (list.contains(LocationManager.GPS_PROVIDER)) {
-            return true;
-        } else if (list.contains(LocationManager.NETWORK_PROVIDER)) {
-            return true;
-        } else {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0F, new MLocationListener(locationManager));
-        }
-        return true;
+        return ContextCompat.checkSelfPermission(context, PermissionType.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(context, PermissionType.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                ;
     }
-    private static class MLocationListener implements LocationListener {
-        private LocationManager mManager;
 
-        public MLocationListener(LocationManager manager) {
-            mManager = manager;
-        }
-
-        @Override
-        public void onLocationChanged(Location location) {
-            mManager.removeUpdates(this);
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            mManager.removeUpdates(this);
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-            mManager.removeUpdates(this);
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-            mManager.removeUpdates(this);
-        }
-    }
 }
