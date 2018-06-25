@@ -7,6 +7,7 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -133,16 +134,26 @@ public final class LifeUtil {
     private static WeakReference<Activity> mWeakReferenceActivity;
 
     private static int mActivityCounts = 0;
+    private static int mActivityCanSeeCounts = 0;
     static AtomicBoolean mIsAppInited = new AtomicBoolean(false);
     public static void init(Application application) {
         if (mIsAppInited.compareAndSet(false,true)){
             application.registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacksAdapter() {
                 @Override
+                public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+                    super.onActivityCreated(activity, savedInstanceState);
+                    if (mActivityCounts == 0){
+                        mWeakReferenceActivity = new WeakReference<Activity>(activity);
+                    }
+                    mActivityCounts++;
+                }
+
+                @Override
                 public void onActivityStarted(Activity activity) {
                     super.onActivityStarted(activity);
                     mWeakReferenceActivity = new WeakReference<Activity>(activity);
-                    mActivityCounts++;
-                    if (mActivityCounts == 1){
+                    mActivityCanSeeCounts++;
+                    if (mActivityCanSeeCounts == 1){
                         if (mAppFourgroundOrBackgroundChangeListener != null){
                             mAppFourgroundOrBackgroundChangeListener.change(false);
                         }
@@ -153,8 +164,8 @@ public final class LifeUtil {
                 @Override
                 public void onActivityStopped(Activity activity) {
                     super.onActivityStopped(activity);
-                    mActivityCounts--;
-                    if (mActivityCounts == 0){
+                    mActivityCanSeeCounts--;
+                    if (mActivityCanSeeCounts == 0){
                         if (mAppFourgroundOrBackgroundChangeListener != null){
                             mAppFourgroundOrBackgroundChangeListener.change(true);
                         }
@@ -173,6 +184,7 @@ public final class LifeUtil {
                 public void onActivityDestroyed(Activity activity) {
                     super.onActivityDestroyed(activity);
                     InputMethodManagerUtil.fixInputMethodManagerLeak(activity);
+                    mActivityCounts--;
                 }
             });
         }
