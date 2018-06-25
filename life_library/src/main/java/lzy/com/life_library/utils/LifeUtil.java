@@ -254,28 +254,17 @@ public final class LifeUtil {
     }
     public static EmptyFragment getFragment(Fragment fragment) {
         EmptyFragment emptyFragment = findFragment(fragment);
-        compatibleFragment(fragment);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            fragment.getChildFragmentManager()
+        if (emptyFragment == null) {
+            emptyFragment = new EmptyFragment();
+            FragmentManager fragmentManager = fragment.getFragmentManager();
+            fragmentManager
                     .beginTransaction()
                     .add(emptyFragment, TAG)
                     .commitAllowingStateLoss();
+            fragmentManager.executePendingTransactions();
         }
-
         return emptyFragment;
     }
-    private static void compatibleFragment(Fragment fragment) {
-        try {
-            Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
-            childFragmentManager.setAccessible(true);
-            childFragmentManager.set(fragment, null);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 
     private static EmptyFragment findFragment(Activity activity) {
         return (EmptyFragment) activity.getFragmentManager().findFragmentByTag(TAG);
