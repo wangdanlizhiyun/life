@@ -87,18 +87,9 @@ public final class LifeUtil {
         }
     }
 
-    static LruCache<String, PermissionRequestBuilder> sPermissionRequestBuilderLruCache;
 
     public static PermissionRequestBuilder permission(String... permissions) {
-        if (sPermissionRequestBuilderLruCache == null) {
-            sPermissionRequestBuilderLruCache = new LruCache<>(1);
-        }
-        PermissionRequestBuilder permissionRequestBuilder = sPermissionRequestBuilderLruCache.get("permissionRequestBuilderLruCache");
-        if (permissionRequestBuilder == null) {
-            permissionRequestBuilder = new PermissionRequestBuilder();
-            sPermissionRequestBuilderLruCache.put("permissionRequestBuilderLruCache", permissionRequestBuilder);
-        }
-        return permissionRequestBuilder.permission(permissions);
+        return new PermissionRequestBuilder().permission(permissions);
     }
 
     private static void requestPermission(@NonNull final Activity activity, final PermissionRequest permissionRequest) {
@@ -217,7 +208,9 @@ public final class LifeUtil {
 
     public static void clearOtherAndStartActivity(Context context,Class clazz){
         finishAllActivities();
-        context.startActivity(new Intent(context,clazz));
+        Intent intent = new Intent(context,clazz);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
     }
 
     public synchronized static void finishAllActivities() {

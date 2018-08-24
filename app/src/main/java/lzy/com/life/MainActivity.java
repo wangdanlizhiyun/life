@@ -66,29 +66,29 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        syncTask = new SyncTask<Boolean,String>(){
-//            @Override
-//            public String doOnbackground(List<Boolean> booleans) {
-//                Log.e("test","点赞开始"+booleans.get(0));
-//                try {
-//                    Thread.sleep(3_000);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                Log.e("test","点赞结束"+booleans.get(0));
-//                return "返回点赞结果:"+booleans.get(0);
-//            }
-//
-//            @Override
-//            public void doOnUiThreadWhenAllBackgroudTaskIsOver(String s) {
-//                Log.e("test","获取点赞结果，修改ui");
-//            }
-//
-//            @Override
-//            public Boolean isRemoveOldTask() {
-//                return true;
-//            }
-//        }.with(this);
+        syncTask = new SyncTask<Boolean,String>(){
+            @Override
+            public String doOnbackground(List<Boolean> booleans) {
+                Log.e("test","点赞开始"+booleans.get(0));
+                try {
+                    Thread.sleep(3_000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Log.e("test","点赞结束"+booleans.get(0));
+                return "返回点赞结果:"+booleans.get(0);
+            }
+
+            @Override
+            public void doOnUiThreadWhenAllBackgroudTaskIsOver(String s) {
+                Log.e("test","获取点赞结果，修改ui");
+            }
+
+            @Override
+            public Boolean isRemoveOldTask() {
+                return true;
+            }
+        }.with(this);
         //快速多次点击模拟点赞。
         findViewById(R.id.sync).setOnClickListener(new View.OnClickListener() {
             @Override
