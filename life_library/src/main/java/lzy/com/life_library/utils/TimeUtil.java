@@ -49,13 +49,17 @@ public class TimeUtil {
     }
 
     public static void setSynTime(long value){
-        sEditor.putLong("synTime",value);
+        synchronized (TimeUtil.class){
+            sEditor.putLong("synTime",value);
+        }
     }
 
-    public static long getSynTime(){
-        long value = sSharedPreferences.getLong("synTime",0);
-        if (value > 0) value = 0;
-        return value;
+    public synchronized static long getSynTime(){
+        synchronized (TimeUtil.class){
+            long value = sSharedPreferences.getLong("synTime",0);
+            if (value > 0) value = 0;
+            return value;
+        }
     }
 
     public static long getNetworkTime(String webUrl) {
