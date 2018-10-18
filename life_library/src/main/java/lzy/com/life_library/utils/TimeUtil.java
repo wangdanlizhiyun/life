@@ -57,7 +57,11 @@ public class TimeUtil {
     public synchronized static long getSynTime(){
         synchronized (TimeUtil.class){
             long value = sSharedPreferences.getLong("synTime",0);
-            if (value > 0) value = 0;
+            if (value > 0){
+                value = 1;
+            }else {
+                value = 0;
+            }
             return value;
         }
     }
