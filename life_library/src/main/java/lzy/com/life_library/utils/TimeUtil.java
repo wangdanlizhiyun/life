@@ -48,7 +48,7 @@ public class TimeUtil {
     }
 
     public static long getDelayTime(long totalTime){
-        if (TimeUtil.getSynTime() == 0L){
+        if (TimeUtil.getSynTime() <= 0L){
             return -1;
         }
         if (totalTime <= 0) {
@@ -61,6 +61,7 @@ public class TimeUtil {
     public static void setSynTime(long value){
         synchronized (TimeUtil.class){
             sEditor.putLong("synTime",value);
+            sEditor.commit();
         }
     }
 
