@@ -42,10 +42,20 @@ public class TimeUtil {
     public static void syncTime(Context context){
         sSharedPreferences = context.getSharedPreferences(TimeUtil.class.getName(),Context.MODE_MULTI_PROCESS);
         sEditor = sSharedPreferences.edit();
-
         Constraints constraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
         PeriodicWorkRequest workRequest = new PeriodicWorkRequest.Builder(TimeWork.class,2,TimeUnit.HOURS).setConstraints(constraints).build();
         WorkManager.getInstance().enqueue(workRequest);
+    }
+
+    public static long getDelayTime(long totalTime){
+        if (TimeUtil.getSynTime() == 0L){
+            return -1;
+        }
+        if (totalTime <= 0) {
+            return -1;
+        }
+        long offSet = getCurrentWebTime() - getSynTime();
+        return totalTime - offSet % totalTime;
     }
 
     public static void setSynTime(long value){
