@@ -3,6 +3,7 @@ package lzy.com.life_library.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -25,8 +26,7 @@ import androidx.work.Worker;
 public class TimeUtil {
     public static long sLongOffset = 0;
     public static long sSohu;
-    private static SharedPreferences sSharedPreferences;
-    private static SharedPreferences.Editor sEditor;
+    private static Context sContext;
 
     /**
      * 获取当前网络时间
@@ -40,8 +40,7 @@ public class TimeUtil {
      * 开启同步时间，启动界面执行一次
      */
     public static void syncTime(Context context){
-        sSharedPreferences = context.getSharedPreferences(TimeUtil.class.getName(),Context.MODE_MULTI_PROCESS);
-        sEditor = sSharedPreferences.edit();
+        sContext = context.getApplicationContext();
         Constraints constraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
         PeriodicWorkRequest workRequest = new PeriodicWorkRequest.Builder(TimeWork.class,2,TimeUnit.HOURS).setConstraints(constraints).build();
         WorkManager.getInstance().enqueue(workRequest);
@@ -60,14 +59,19 @@ public class TimeUtil {
 
     public static void setSynTime(long value){
         synchronized (TimeUtil.class){
-            sEditor.putLong("synTime",value);
-            sEditor.commit();
+            SharedPreferences.Editor edit = sContext.getSharedPreferences(TimeUtil.class.getName(),Context.MODE_MULTI_PROCESS).edit();
+            edit.putLong("synTime",value);
+            edit.commit();
+
+            Log.e("TimeUtil", "setSynTime "+value);
         }
     }
 
     public synchronized static long getSynTime(){
         synchronized (TimeUtil.class){
-            long value = sSharedPreferences.getLong("synTime",0);
+            SharedPreferences sharedPreferences = sContext.getSharedPreferences(TimeUtil.class.getName(),Context.MODE_MULTI_PROCESS);
+            long value = sharedPreferences.getLong("synTime",0);
+            Log.e("TimeUtil", "getSynTime "+value);
             if (value > 0){
                 value = 1;
             }else {
