@@ -62,8 +62,6 @@ public class TimeUtil {
             SharedPreferences.Editor edit = sContext.getSharedPreferences(TimeUtil.class.getName(),Context.MODE_MULTI_PROCESS).edit();
             edit.putLong("synTime",value);
             edit.commit();
-
-            Log.e("TimeUtil", "setSynTime "+value);
         }
     }
 
@@ -71,7 +69,6 @@ public class TimeUtil {
         synchronized (TimeUtil.class){
             SharedPreferences sharedPreferences = sContext.getSharedPreferences(TimeUtil.class.getName(),Context.MODE_MULTI_PROCESS);
             long value = sharedPreferences.getLong("synTime",0);
-            Log.e("TimeUtil", "getSynTime "+value);
             if (value > 0){
                 value = 1;
             }else {
